@@ -1,7 +1,8 @@
 #!/usr/bin/perl
-# The traditional first program.
 
 use strict;
 use warnings;
+require 'sort.pl';
 
-print "Hello, World!\n";
+my @list = (4, 5, 34, 2, 1, 35, 3);
+bubble_sort(\@list);
