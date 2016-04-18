@@ -2,21 +2,21 @@
 
 use strict;
 use warnings;
+use List::MoreUtils qw(zip);
 
 sub compare_switch
 {
     my $arr      = shift;
     my $a        = shift;
     my $b        = shift;
-
     my @list     = @$arr;
     my $switched = 0;
     my @ret      = ($list[$a], $list[$b], $switched);
 
     if ($list[$a] > $list[$b])
     {
-        $switched = 1;
-        @ret      = ($list[$b], $list[$a], $switched);
+        $switched |= 1;
+        @ret       = ($list[$b], $list[$a], $switched);
     }
 
     return @ret;
@@ -36,14 +36,128 @@ sub bubble_sort
             
         $notSorted |= $switched;
 
-        if ($notSorted && $i == ($listSize - 2))
+        if ($i == ($listSize - 2))
         {
-            $i         = 0;
-            $notSorted = 0;
+            if ($notSorted)
+            {
+                $i         = -1;
+                $notSorted = 0;
+            }
+        }
+    }
+}
+
+sub insertion_sort
+{
+    my $arr      = shift;
+    my @list     = @$arr;
+    my $listSize = @list;
+
+    for (my $i = 1; $i < $listSize; $i++)
+    {
+        my $value = $list[$i];
+        my $j     = $i;
+
+        while ($j > 0 && $list[$j-1] > $value)
+        {
+            $list[$j] = $list[$j-1];
+            $j--;
+        }
+
+        $list[$j] = $value;
+    }
+
+    return @list;
+}
+
+sub merge_sort
+{
+    my $arr      = shift;
+    my @list     = @$arr;
+    my $listSize = @list;
+
+    if ($listSize > 1)
+    {
+        my $mid = $listSize / 2;
+
+        my @left  = @list[0 .. $mid-1];
+        my @right = @list[$mid .. $listSize-1];
+
+        @left  = merge_sort(\@left);
+        @right = merge_sort(\@right);
+
+        my $lSize = @left;
+        my $rSize = @right;
+        my @nList;
+        my $k     = 0;
+
+        while ($lSize > 0 && $rSize > 0)
+        {
+            if ($left[0] <= $right[0])
+            {
+                $nList[$k++] = $left[0];
+                @left        = @left[1 .. $lSize-1];
+
+                $lSize--;
+            }
+            else
+            {
+                $nList[$k++] = $right[0];
+                @right       = @right[1 .. $rSize-1];
+
+                $rSize--;
+            }
+        }
+
+        if ($lSize > 0)
+        {
+            @list = (@nList, @left);
+        }
+
+        if ($rSize > 0)
+        {
+            @list = (@nList, @right);
         }
     }
 
-    print " @list\n";
+    return @list;
 }
+
+sub quick_sort
+{
+    my $arr      = shift;
+    my @list     = @$arr;
+    my $listSize = @list;
+
+    if ($listSize > 1)
+    {
+        my (@less, @equal, @greater);
+        
+        my $p    = ($listSize / 2) - 1;
+        my $piv  = $list[$p];
+
+        for (my $i = 0; $i < $listSize; $i++)
+        {
+            if ($list[$i] < $piv)
+            {
+                push(@less, $list[$i]);
+            }
+            elsif ($list[$i] == $piv)
+            {
+                push(@equal, $list[$i]);
+            }
+            else
+            {
+                push(@greater, $list[$i]);
+            }
+        }
+
+        @list = (quick_sort(\@less), @equal, quick_sort(\@greater));
+    }
+
+    return @list;
+}
+
+
 
 1;
