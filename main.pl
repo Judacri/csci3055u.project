@@ -11,7 +11,7 @@ require 'sort.pl';
 require 'xls.pl';
 
 
-my $LIST_SIZE = 10;
+my $LIST_SIZE = 100;
 my @list      = ();
 my @after     = ();
 
@@ -34,22 +34,33 @@ my $format = $workbook->add_format();
 $format->set_num_format('0.000');
 
 my $row		 = 2;
-my $start	 = 0; 
-my $duration = 0;
+my @start	 = (); 
+my @duration = (0, 0, 0, 0);
 
 
 foreach my $key (keys(%sorting)) 
 {
 	print "Sorting Method: $key\n";
-    print "before: @list\n";
+    print "$key before: @list\n";
 
-	$start    = time();
-    #@after    = $sorting{$key}->(\@list);
-    ($thr[$row-2]) = threads->create($sorting{$key}, \@list);
+	$start[$row-2] = time();
+   # @after    = $sorting{$key}->(\@list);
+    ($thr[($row++)-2]) = threads->create($sorting{$key}, \@list);
+}
 
-    @after = $thr[$row-2]->join();
-	$duration = time() - $start;
+my $num = 0;
+foreach my $key (keys(%sorting)) 
+{
+	@after          = $thr[$num]->join();
+	$duration[$num] = (time() - $start[$num])*1000;
 
-   	print "after: @after\n\n";
-   	$worksheet->write('B'.$row++, $duration*1000000, $format);
+   	print "$key after: @after\n";
+   	print "$key duration: $duration[$num]\n";
+   	$num++;
+}
+
+$row = 2;
+foreach my $dur (@duration)
+{
+	$worksheet->write('B'.$row++, $dur, $format);
 }
