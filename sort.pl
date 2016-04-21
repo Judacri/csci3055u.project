@@ -2,25 +2,7 @@
 
 use strict;
 use warnings;
-use List::MoreUtils qw(zip);
 
-sub compare_switch
-{
-    my $arr      = shift;
-    my $a        = shift;
-    my $b        = shift;
-    my @list     = @$arr;
-    my $switched = 0;
-    my @ret      = ($list[$a], $list[$b], $switched);
-
-    if ($list[$a] > $list[$b])
-    {
-        $switched |= 1;
-        @ret       = ($list[$b], $list[$a], $switched);
-    }
-
-    return @ret;
-}
 
 sub bubble_sort
 {
@@ -28,13 +10,13 @@ sub bubble_sort
     my @list      = @$arr;
     my $listSize  = @list;
     my $notSorted = 0;
-    my $switched  = 0;
 
     for (my $i = 0; $i < ($listSize - 1); $i++)
     {
-        ($list[$i], $list[$i+1], $switched) = compare_switch(\@list, $i, $i+1);
-            
-        $notSorted |= $switched;
+        if ($list[$i] > $list[$i+1])
+        {
+            ($list[$i], $list[$i+1], $notSorted) = ($list[$i+1], $list[$i], 1);
+        }
 
         if ($i == ($listSize - 2))
         {
@@ -45,7 +27,10 @@ sub bubble_sort
             }
         }
     }
+
+    return (@list);
 }
+
 
 sub insertion_sort
 {
@@ -69,6 +54,7 @@ sub insertion_sort
 
     return @list;
 }
+
 
 sub merge_sort
 {
@@ -123,6 +109,7 @@ sub merge_sort
     return @list;
 }
 
+
 sub quick_sort
 {
     my $arr      = shift;
@@ -157,7 +144,6 @@ sub quick_sort
 
     return @list;
 }
-
 
 
 1;
