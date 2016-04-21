@@ -55,12 +55,22 @@ foreach my $key (keys(%sorting))
 	$duration[$num] = (time() - $start[$num])*1000;
 
    	print "$key after: @after\n";
-   	print "$key duration: $duration[$num]\n";
+   	print "$key duration: $duration[$num] ms\n";
    	$num++;
 }
 
 $row = 2;
 foreach my $dur (@duration)
 {
-	$worksheet->write('B'.$row++, $dur, $format);
+	while(threads->get_stack_size() != 0)
+	{
+		if ($thr[$row-2]->is_running())
+		{
+			sleep(2);
+		}
+		else
+		{
+			$worksheet->write('B'.$row++, $dur, $format);
+		}
+	}
 }
